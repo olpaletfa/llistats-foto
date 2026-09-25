@@ -20,7 +20,47 @@ from openpyxl.drawing.image import Image as OpenpyxlImage
 
 # Configuración para permitir imágenes truncadas/incompletas
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+# --- SISTEMA DE ACCESO ---
+# Cambia "ESCAC2026" por la contraseña que quieras usar
+CODIGO_ACCESO = "ESCAC2026" 
 
+def check_password():
+    """Devuelve True si el usuario ha introducido el código correcto."""
+    
+    def password_entered():
+        # Comprueba si el código ingresado coincide
+        if st.session_state["password"] == CODIGO_ACCESO:
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # Por seguridad, borramos la variable
+        else:
+            st.session_state["password_correct"] = False
+
+    # Si no hay registro de que la contraseña sea correcta
+    if "password_correct" not in st.session_state:
+        st.markdown("### 🔒 Acceso Restringido")
+        st.text_input(
+            "Por favor, introduce el código de acceso para continuar:", 
+            type="password", 
+            on_change=password_entered, 
+            key="password"
+        )
+        return False
+        
+    # Si la contraseña introducida es incorrecta
+    elif not st.session_state["password_correct"]:
+        st.markdown("### 🔒 Acceso Restringido")
+        st.text_input(
+            "Por favor, introduce el código de acceso para continuar:", 
+            type="password", 
+            on_change=password_entered, 
+            key="password"
+        )
+        st.error("😕 Código incorrecto. Inténtalo de nuevo.")
+        return False
+        
+    # Si la contraseña es correcta
+    else:
+        return True
 # --- FUNCIONES DE CONEXIÓN ---
 
 def getToken():
@@ -312,6 +352,14 @@ def makePdf_Web(lista, h, nombrePdf, access_token):
 # --- APP PRINCIPAL ---
 def main():
     st.set_page_config(page_title="Generador Listas ESCAC", layout="wide")
+    
+    # ----------------------------------------------------
+    # BLOQUEO DE SEGURIDAD: Comprobar código de acceso
+    if not check_password():
+        st.stop()  # Detiene la carga de la app si no hay código correcto
+    # ----------------------------------------------------
+    
+    # Si el código es correcto, el script sigue por aquí:
     st.markdown("""<style>#MainMenu {visibility: hidden;} footer {visibility: hidden;}</style>""", unsafe_allow_html=True)
     st.title("🎓 Generador de Listas de Alumnos")
 
