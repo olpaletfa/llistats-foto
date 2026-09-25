@@ -25,13 +25,13 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def getToken():
     url = "https://login.salesforce.com/services/oauth2/token"
-payload = {
-    "grant_type": "password",
-    "client_id": st.secrets["sf_client_id"],
-    "client_secret": st.secrets["sf_client_secret"],
-    "username": st.secrets["sf_username"],
-    "password": st.secrets["sf_password"],
-}
+    payload = {
+        "grant_type": "password",
+        "client_id": st.secrets["sf_client_id"],
+        "client_secret": st.secrets["sf_client_secret"],
+        "username": st.secrets["sf_username"],
+        "password": st.secrets["sf_password"],
+    }
     headers = {}
     response = requests.request("POST", url, headers=headers, data=payload)
     return response, response.text
